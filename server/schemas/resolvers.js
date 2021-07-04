@@ -6,20 +6,18 @@ const resolvers = {
   
   // getSingleUser
   Query: {
-    getSingleUser: async (_parent, { username }) => {
-      return User.findOne({ username })
-        .select('-__v -password')
-        .populate('savedBooks')
-    },
+
+    // getSingleUser: async (_parent, { username }) => {
+    //   return User.findOne({ username })
+    //     .select('-__v -password')
+    //     // .populate('savedBooks') // should be part of the single user you are retrieving
+    // },
 
     me: async (_parent, _args, context) => {
       if (context.user) {
         const userData = await User.findOne({ _id: context.user._id })
-          .populate({
-            path: 'savedBooks',
-            select: '-__v'
-          })
           .select('-__v -password')
+           // .populate('savedBooks') // should be part of the single user you are retrieving
         
         return userData;
       }
@@ -57,14 +55,15 @@ const resolvers = {
 
     },
 
-    saveBook: async (_parent, input, context) => {
+    saveBook: async (_parent, { input }, context) => {  // destructure 'input' object from main object
       if (context.user) {
+        // console.log(input);
+        
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id},
           { $addToSet: { savedBooks: input}},
           { new: true }
         )
-        .populate('savedBooks');
 
         return updatedUser;
       }
@@ -80,7 +79,6 @@ const resolvers = {
           { $pull: { savedBooks: { bookId: bookId}}},
           { new: true }
         )
-        .populate('savedBooks');
 
         return updatedUser;
       }

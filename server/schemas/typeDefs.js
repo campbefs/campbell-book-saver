@@ -38,6 +38,7 @@ const typeDefs = gql`
   type Query {
     getSingleUser(username: String!): User # OK
     me: User # OK
+    
   }
 
   type Mutation {
