@@ -11,7 +11,7 @@ import { GET_ME } from '../utils/queries';
 import { REMOVE_BOOK } from '../utils/mutations';
 
 const SavedBooks = () => {
-  const [userData, setUserData] = useState({});
+  // const [userData, setUserData] = useState({});
 
   ///// QUERY BOOK
   const { loading, data } = useQuery(GET_ME);
@@ -23,14 +23,16 @@ const SavedBooks = () => {
     return <div>Loading...</div>;
   }
 
-  const user = data.me || {};
-  setUserData(user);
+  const userData = data?.me || {};
+  
+  // setUserData(user);
 
-
+  console.log('userdata: ', userData);
 
 
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length;
+
 
   // useEffect(() => {
   //   const getUserData = async () => {
