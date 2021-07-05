@@ -1,5 +1,5 @@
 // import React, { useState, useEffect } from 'react';
-import React, { useState } from 'react';
+import React, { } from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
 
 // import { getMe, deleteBook } from '../utils/API';
@@ -11,10 +11,11 @@ import { GET_ME } from '../utils/queries';
 import { REMOVE_BOOK } from '../utils/mutations';
 
 const SavedBooks = () => {
-  // const [userData, setUserData] = useState({});
-
   ///// QUERY BOOK
+
   const { loading, data } = useQuery(GET_ME);
+
+  let userData = data?.me || {};
 
   ///// REMOVE BOOK - MUST COME AT TOP
   const[removeBook, { error }] = useMutation(REMOVE_BOOK);
@@ -23,16 +24,10 @@ const SavedBooks = () => {
     return <div>Loading...</div>;
   }
 
-  const userData = data?.me || {};
-  
-  // setUserData(user);
-
-  console.log('userdata: ', userData);
 
 
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length;
-
 
   // useEffect(() => {
   //   const getUserData = async () => {
@@ -65,6 +60,8 @@ const SavedBooks = () => {
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
+    console.log('userdata: ', userData);
+
     if (!token) {
       return false;
     }
@@ -78,12 +75,13 @@ const SavedBooks = () => {
 
       // const updatedUser = await response.json();
       // setUserData(updatedUser);
-      
 
+      console.log('remove bookId: ', bookId);
 
-      await removeBook(bookId);
+      await removeBook({variables: {bookId}});   /// MUST PASS ARGUMENTS LIKE THIS
 
       // upon success, remove book's id from localStorage
+
       removeBookId(bookId); // keep in place
 
     } catch (err) {

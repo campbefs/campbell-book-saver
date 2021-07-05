@@ -35,15 +35,14 @@ const resolvers = {
       return { token, user };
     },
 
-    login: async (_parent, { email, password }) => {
+    login: async (parent, { email, password }) => {
       const user = await User.findOne({ email });
 
       if (!user) {
         throw new AuthenticationError('Incorrect credentials');
       }
 
-      // this is a hook in the User model that uses bcrypt
-      const correctPw = await user.isCorrectPassword(password); 
+      const correctPw = await user.isCorrectPassword(password);
 
       if (!correctPw) {
         throw new AuthenticationError('Incorrect credentials');
@@ -52,7 +51,6 @@ const resolvers = {
       const token = signToken(user);
 
       return { token, user };
-
     },
 
     saveBook: async (_parent, { input }, context) => {  // destructure 'input' object from main object
@@ -73,6 +71,9 @@ const resolvers = {
 
     removeBook: async (_parent, { bookId }, context) => {
       
+      console.log('resolver: ', bookId);
+      // console.log('userId: ', context.user._id);
+
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },

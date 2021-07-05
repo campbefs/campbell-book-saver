@@ -2,7 +2,9 @@ const jwt = require('jsonwebtoken');
 
 // set token secret and expiration date
 const secret = 'mysecretsshhhhh';
-const expiration = '24h';
+// const expiration = '24h';
+const expiration = '2h';
+
 
 module.exports = {
 
@@ -14,7 +16,12 @@ module.exports = {
 
   authMiddleware: function({ req }) {
     // allow token to be sent via req.body, req.query or headers
-    let token = req.body.token || req.body.token || req.headers.authorization;
+    // console.log('headers auth: ', req.headers.authorization);
+    // console.log('req.body.token: ', req.body.token);
+
+    let token = req.body.token || req.headers.authorization;
+    // let token = req.body.token || req.headers.authorization;
+    // console.log('token: ', token);
 
     // separate bearer from token value
     if (req.headers.authorization) {
@@ -31,7 +38,20 @@ module.exports = {
 
     try {
       // decode and attach user data to request object
+
+      // console.log('token2: ', token);
       const { data } = jwt.verify(token, secret, { maxAge: expiration });
+      
+      // debugging auth
+      // const { data } = jwt.verify(token, secret, { maxAge: expiration }, function(err, decoded) {
+      //   if (err) {
+      //     console.log(err);
+      //   } else {
+      //     console.log(decoded);
+      //   }
+      // });
+
+      // console.log('data: ', data);
       req.user = data;
     } catch {
       console.log('Invalid token');
