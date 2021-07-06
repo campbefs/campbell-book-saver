@@ -1,5 +1,5 @@
 // import React, { useState, useEffect } from 'react';
-import React, { } from 'react';
+import React, { useEffect } from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
 
 // import { getMe, deleteBook } from '../utils/API';
@@ -12,49 +12,22 @@ import { REMOVE_BOOK } from '../utils/mutations';
 
 const SavedBooks = () => {
   ///// QUERY BOOK
-
-  const { loading, data } = useQuery(GET_ME);
+  const { loading, data, refetch } = useQuery(GET_ME);
 
   let userData = data?.me || {};
 
   ///// REMOVE BOOK - MUST COME AT TOP
   const[removeBook, { error }] = useMutation(REMOVE_BOOK);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
+  // REFRESH CATCH UPON PAGE LOAD (1 TIME ONLY - refetch is a constant)
+  useEffect(() => {
+    // console.log(userData);
+    refetch();
+  }, [refetch]);
 
 
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length;
-
-  // useEffect(() => {
-  //   const getUserData = async () => {
-  //     try {
-  //       const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-  //       if (!token) {
-  //         return false;
-  //       }
-
-  //       const response = await getMe(token);
-
-  //       if (!response.ok) {
-  //         throw new Error('something went wrong!');
-  //       }
-
-  //       const user = await response.json();
-  //       setUserData(user);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-
-  //   getUserData();
-  // }, [userDataLength]);
-
-
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
@@ -67,32 +40,30 @@ const SavedBooks = () => {
     }
 
     try {
-      // const response = await deleteBook(bookId, token);
-
-      // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // }
-
-      // const updatedUser = await response.json();
-      // setUserData(updatedUser);
-
       console.log('remove bookId: ', bookId);
 
       await removeBook({variables: {bookId}});   /// MUST PASS ARGUMENTS LIKE THIS
 
+      refetch(); // refetch from server instead of relying on cache
+
       // upon success, remove book's id from localStorage
-
       removeBookId(bookId); // keep in place
-
+      
     } catch (err) {
       console.error(err);
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   // if data isn't here yet, say so
   if (!userDataLength) {
     return <h2>LOADING...</h2>;
   }
+
+
 
   return (
     <>
